@@ -9,7 +9,7 @@ App developed during DIO's (Digital Innovation One) Android training
 ## Step History
 + **Initial step (01/23/2025)**
 
-![](./readme_imgs/00_hello.png)
+    ![](./readme_imgs/00_hello.png)
 
 + **Layout's Classes (01/24/2025)**
     - Linear
@@ -19,3 +19,7 @@ App developed during DIO's (Digital Innovation One) Android training
     - Relative
     
         ![](./readme_imgs/02_layouts.png)
+    
+    - Constraint
+
+        ![](./readme_imgs/03_layouts.png)
