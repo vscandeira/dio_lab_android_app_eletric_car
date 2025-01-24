@@ -6,7 +6,7 @@ App developed during DIO's (Digital Innovation One) Android training
 + Add multi-language support and put strings on strings.xml file
     - What about strings that needs to be kept secret? Google it
 
-## Stage History
+## Step History
 + **Initial Stage (01/23/2025)**
 
 ![](./readme_imgs/00_hello.png)
