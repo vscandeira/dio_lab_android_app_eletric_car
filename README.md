@@ -1,6 +1,11 @@
 # Eletric Car - Educational Purposes only
 App developed during DIO's (Digital Innovation One) Android training
 
+## TO-DO
++ Follow the training path
++ Add multi-language support and put strings on strings.xml file
+    - What about strings that needs to be kept secret? Google it
+
 ## Stage History
 + **Initial Stage (01/23/2025)**
 
