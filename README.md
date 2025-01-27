@@ -11,4 +11,9 @@ App developed during DIO's (Digital Innovation One) Android training
     - Final work (for now)
 
         ![](./readme_imgs/05_layouts.png)
+    
+    - After including edit fields
+
+        ![](./readme_imgs/06_layouts.png)
+    
 
