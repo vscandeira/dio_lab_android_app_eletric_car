@@ -11,4 +11,7 @@
     <string name="field_power_val">646 cv</string>
     <string name="field_charge">Charge:</string>
     <string name="field_charge_val">25min</string>
+    <string name="filed_inp_price_per_km">Price per km</string>
+    <string name="filed_inp_km_traveled">Km traveled</string>
+    <string name="button_calculate">Calculate</string>
 </resources>
