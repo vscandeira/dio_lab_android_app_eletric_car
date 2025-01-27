@@ -14,4 +14,5 @@
     <string name="filed_inp_price_per_km">Price per km</string>
     <string name="filed_inp_km_traveled">Km traveled</string>
     <string name="button_calculate">Calculate</string>
+    <string name="field_result_of_calculation">Result of calculation:</string>
 </resources>
