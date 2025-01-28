@@ -15,4 +15,9 @@
     <string name="filed_inp_km_traveled">Km traveled</string>
     <string name="button_calculate">Calculate</string>
     <string name="field_result_of_calculation">Result of calculation:</string>
+    <string name="field_go_back_home">GO BACK HOME</string>
+    <string name="field_go_to_calculate_function">GO TO CALCULATE FUNCTION</string>
+    <string name="field_calculate_autonomy">Calculate Autonomy</string>
+    <string name="desc_fab_gotocalc_button">Button to function that computes autonomy</string>
+    <string name="desc_iv01">An eletric car</string>
 </resources>
