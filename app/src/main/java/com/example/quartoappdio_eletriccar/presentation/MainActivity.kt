@@ -7,21 +7,28 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.quartoappdio_eletriccar.R
+import com.example.quartoappdio_eletriccar.presentation.adapter.CarAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : ComponentActivity() {
     lateinit var btnCalc: FloatingActionButton
+    lateinit var listCars: RecyclerView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         setupView()
         setupListeners()
+        setupList()
     }
 
     fun setupView() {
         btnCalc = findViewById(R.id.fab_goto_calc)
+        listCars = findViewById(R.id.rv_list_cars)
     }
     fun setupListeners() {
         btnCalc.setOnClickListener{
@@ -41,5 +48,17 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent(this, CalcAutonomyActivity::class.java))
             //*/
         }
+    }
+
+    fun setupList() {
+        var dados = arrayOf(
+            "First",
+            "Second",
+            "Third"
+        )
+
+        val adapter = CarAdapter(dados)
+        listCars.layoutManager = LinearLayoutManager(this)
+        listCars.adapter = adapter
     }
 }
