@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.quartoappdio_eletriccar.R
 import com.example.quartoappdio_eletriccar.presentation.adapter.CarAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.example.quartoappdio_eletriccar.data.CarFactory
 
 class MainActivity : ComponentActivity() {
     lateinit var btnCalc: FloatingActionButton
@@ -51,14 +52,8 @@ class MainActivity : ComponentActivity() {
     }
 
     fun setupList() {
-        var dados = arrayOf(
-            "First",
-            "Second",
-            "Third"
-        )
-
-        val adapter = CarAdapter(dados)
-        listCars.layoutManager = LinearLayoutManager(this)
+        val adapter = CarAdapter(CarFactory.listCars)
+        //listCars.layoutManager = LinearLayoutManager(this)
         listCars.adapter = adapter
     }
 }

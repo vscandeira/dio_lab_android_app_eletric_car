@@ -1,4 +1,4 @@
-package com.example.quartoappdio_eletriccar.presentation.adapter
+package com.example.quartoappdio_eletriccar.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater

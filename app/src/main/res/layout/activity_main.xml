@@ -21,6 +21,25 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <!--<com.google.android.material.tabs.TabLayout
+        android:id="@+id/tl_menus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/subtitle_all_cars"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/subtitle_all_cars"/>
+
+    </com.google.android.material.tabs.TabLayout> -->
+
     <TextView
         android:id="@+id/tv_cars"
         android:layout_width="wrap_content"
@@ -46,13 +65,14 @@
     
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_list_cars"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_cars"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/car_item"
+        tools:listitem="@layout/item_car"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
