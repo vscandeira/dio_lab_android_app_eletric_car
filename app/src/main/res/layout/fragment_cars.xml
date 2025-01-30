@@ -10,14 +10,26 @@
     android:paddingBottom="16dp"
     android:paddingTop="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cars"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_list_cars"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:listitem="@layout/item_car"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_goto_calc"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/calc"
+        android:contentDescription="@string/desc_fab_gotocalc_button"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

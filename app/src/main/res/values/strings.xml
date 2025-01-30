@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">QuartoAppDio_EletricCar</string>
-    <string name="title_eletric_car">Eletric Car</string>
+    <string name="app_name">Eletric Cars</string>
     <string name="subtitle_all_cars">All Cars</string>
     <string name="subtitle_fav">Favorites</string>
     <string name="field_price">Price:</string>

@@ -17,8 +17,12 @@ App developed during DIO's (Digital Innovation One) Android training
         ![](./readme_imgs/06_layouts.png)
 
 + **Layout adjustments (01/29/2025)**
-    - One card and separated activities
 
-        ![](./readme_imgs/07_layouts.png)
+    ![](./readme_imgs/07_layouts.png)
+
++ **Insertion of tabs and correction of problems with them (01/30/2025)**
+
+    ![](./readme_imgs/08_layouts.png)
+
     
 

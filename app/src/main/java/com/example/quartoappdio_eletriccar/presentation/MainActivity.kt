@@ -1,22 +1,15 @@
 package com.example.quartoappdio_eletriccar.presentation
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import androidx.activity.ComponentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.example.quartoappdio_eletriccar.R
-import com.example.quartoappdio_eletriccar.presentation.adapter.CarAdapter
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.example.quartoappdio_eletriccar.data.CarFactory
+import com.example.quartoappdio_eletriccar.presentation.adapter.TabsAdapter
+import com.google.android.material.tabs.TabLayout
 
-class MainActivity : ComponentActivity() {
-    lateinit var btnCalc: FloatingActionButton
-    lateinit var listCars: RecyclerView
+class MainActivity : AppCompatActivity() {
+    lateinit var tabLayout: TabLayout
+    lateinit var viewPager: ViewPager2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,36 +17,38 @@ class MainActivity : ComponentActivity() {
 
         setupView()
         setupListeners()
-        setupList()
+        setupTabs()
     }
 
     fun setupView() {
-        btnCalc = findViewById(R.id.fab_goto_calc)
-        listCars = findViewById(R.id.rv_list_cars)
+        tabLayout = findViewById(R.id.tl_menus)
+        viewPager = findViewById(R.id.vp_section)
     }
+    fun setupTabs() {
+        val tabsAdapter = TabsAdapter(this)
+        viewPager.adapter = tabsAdapter
+    }
+
     fun setupListeners() {
-        btnCalc.setOnClickListener{
-            /* forma 1: passando contexto
-            val i : Intent = Intent()
-            i.setClassName(this, "com.example.quartoappdio_eletriccar.presentation.CalcAutonomyActivity")
-            startActivity(i)
-            */
+        tabLayout.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.run {
+                    viewPager.currentItem = position
+                }
+            }
 
-            /* forma 2: por package name
-            val i : Intent = Intent()
-            i.setClassName("com.example.quartoappdio_eletriccar", "com.example.quartoappdio_eletriccar.presentation.CalcAutonomyActivity")
-            startActivity(i)
-            */
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
 
-            ///* forma 3: quando activity interna
-            startActivity(Intent(this, CalcAutonomyActivity::class.java))
-            //*/
-        }
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+
+        })
+
+        viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                tabLayout.getTabAt(position)?.select()
+            }
+        })
     }
 
-    fun setupList() {
-        val adapter = CarAdapter(CarFactory.listCars)
-        //listCars.layoutManager = LinearLayoutManager(this)
-        listCars.adapter = adapter
-    }
 }
