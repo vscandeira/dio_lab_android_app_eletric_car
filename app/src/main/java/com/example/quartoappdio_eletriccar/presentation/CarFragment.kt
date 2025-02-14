@@ -13,7 +13,9 @@ import com.example.quartoappdio_eletriccar.R
 import com.example.quartoappdio_eletriccar.data.CarFactory
 import com.example.quartoappdio_eletriccar.presentation.adapter.CarAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONTokener
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -76,7 +78,6 @@ class CarFragment : Fragment() {
                 urlConnection.connectTimeout = 60000
                 urlConnection.readTimeout = 60000
 
-                //response = streamToString(urlConnection.inputStream)
                 response = urlConnection.inputStream.bufferedReader().use{ it.readText() }
                 publishProgress(response)
                 urlConnection.disconnect()
@@ -86,40 +87,24 @@ class CarFragment : Fragment() {
                 urlConnection?.disconnect()
             }
 
-            Log.d("DEBUG", "Response correctly received: \n${response}")
+            //Log.d("DEBUG", "Response correctly received: \n${response}")
             return response ?: url[0] ?: "No URL Informed"
         }
 
         override fun onProgressUpdate(vararg values: String?) {
             super.onProgressUpdate(*values)
             try {
-                var json : JSONObject
+                val jsonArray : JSONArray
                 values[0]?.let{
-                    json = JSONObject(it)
+                    jsonArray = JSONTokener(it).nextValue() as JSONArray
+                    for (i in 0 until jsonArray.length()){
+                        Log.d("DEBUG", "Received JSON Object ${i+1}: \n${jsonArray[i]}")
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("DEBUG", "ERRO NO PROGRESS UPDATE\n${e}")
             }
         }
 
-        /*
-        fun streamToString(inputStream : InputStream) : String {
-            val buffReader = BufferedReader(InputStreamReader(inputStream))
-            var line : String
-            var result = ""
-
-            try {
-                do {
-                    line = buffReader.readLine()
-                    line?.let {
-                        result += line
-                    }
-                } while (line != null)
-            } catch (e : Exception) {
-                Log.e("DEBUG", "ERRO AO PARSEAR STREAM\n${e}")
-            }
-            return result
-        }
-        */
     }
 }
