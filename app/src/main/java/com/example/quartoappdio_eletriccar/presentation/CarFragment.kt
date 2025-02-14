@@ -26,6 +26,7 @@ import java.net.URL
 class CarFragment : Fragment() {
     lateinit var listCars: RecyclerView
     lateinit var btnCalc: FloatingActionButton
+    var carArray : ArrayList<Car> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +39,7 @@ class CarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupView(view)
-        setupList()
+        MyTask().execute("http://192.168.1.10:8080/api/cars/")
         setupListeners()
     }
 
@@ -50,24 +51,23 @@ class CarFragment : Fragment() {
     }
 
     fun setupList() {
-        val adapter = CarAdapter(CarFactory.listCars)
+        val adapter = CarAdapter(carArray)
         listCars.adapter = adapter
     }
 
     fun setupListeners() {
         btnCalc.setOnClickListener {
-            MyTask().execute("http://192.168.1.10:8080/api/cars/")
-            //startActivity(Intent(context, CalcAutonomyActivity::class.java))
+            startActivity(Intent(context, CalcAutonomyActivity::class.java))
         }
     }
 
     inner class MyTask : AsyncTask<String, String, String>() {
         override fun onPreExecute() {
             super.onPreExecute()
-            Log.d("DEBUG","My Task - onPreExecute (starting)")
+            //Log.d("DEBUG","My Task - onPreExecute (starting)")
         }
         override fun doInBackground(vararg url: String?): String {
-            Log.d("DEBUG","My Task - doInBackground with params: ${url[0]}")
+            //Log.d("DEBUG","My Task - doInBackground with params: ${url[0]}")
 
             var urlConnection : HttpURLConnection? = null
             var response : String? = null
@@ -123,8 +123,10 @@ class CarFragment : Fragment() {
                             charge = formatNumber(false, 0, " min", chargeProv) ?: "-",
                             urlPhoto = urlPhotoProv
                         )
-                        Log.d("DEBUG", "Received JSON Object ${i+1} of price ${model.price}")
+                        carArray.add(model)
+                        //Log.d("DEBUG", "Received JSON Object ${i+1} of price ${model.price}, battery ${model.battery}, power ${model.power} and charge ${model.charge}")
                     }
+                    setupList()
                 }
             } catch (e: Exception) {
                 Log.e("DEBUG", "ERRO NO PROGRESS UPDATE\n${e}")
