@@ -3,6 +3,7 @@ App developed during DIO's (Digital Innovation One) Android training
 
 ## TO-DO
 + Follow the training path
++ Refactor deprecated async task to an updated Kotlin component
 + Add multi-language support
     - What about strings that needs to be kept secret? Google it
 

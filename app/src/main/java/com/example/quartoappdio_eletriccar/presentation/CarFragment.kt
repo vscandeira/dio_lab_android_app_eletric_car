@@ -1,7 +1,9 @@
 package com.example.quartoappdio_eletriccar.presentation
 
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +13,12 @@ import com.example.quartoappdio_eletriccar.R
 import com.example.quartoappdio_eletriccar.data.CarFactory
 import com.example.quartoappdio_eletriccar.presentation.adapter.CarAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 class CarFragment : Fragment() {
     lateinit var listCars: RecyclerView
@@ -45,7 +53,73 @@ class CarFragment : Fragment() {
 
     fun setupListeners() {
         btnCalc.setOnClickListener {
-            startActivity(Intent(context, CalcAutonomyActivity::class.java))
+            MyTask().execute("http://192.168.1.10:8080/api/cars/")
+            //startActivity(Intent(context, CalcAutonomyActivity::class.java))
         }
+    }
+
+    inner class MyTask : AsyncTask<String, String, String>() {
+        override fun onPreExecute() {
+            super.onPreExecute()
+            Log.d("DEBUG","My Task - onPreExecute (starting)")
+        }
+        override fun doInBackground(vararg url: String?): String {
+            Log.d("DEBUG","My Task - doInBackground with params: ${url[0]}")
+
+            var urlConnection : HttpURLConnection? = null
+            var response : String? = null
+
+            try {
+                val urlBase = URL(url[0])
+
+                urlConnection = urlBase.openConnection() as HttpURLConnection
+                urlConnection.connectTimeout = 60000
+                urlConnection.readTimeout = 60000
+
+                //response = streamToString(urlConnection.inputStream)
+                response = urlConnection.inputStream.bufferedReader().use{ it.readText() }
+                publishProgress(response)
+                urlConnection.disconnect()
+            } catch (e : Exception) {
+                Log.e("DEBUG", "ERRO NA CONEXÃO\n${e}")
+            } finally {
+                urlConnection?.disconnect()
+            }
+
+            Log.d("DEBUG", "Response correctly received: \n${response}")
+            return response ?: url[0] ?: "No URL Informed"
+        }
+
+        override fun onProgressUpdate(vararg values: String?) {
+            super.onProgressUpdate(*values)
+            try {
+                var json : JSONObject
+                values[0]?.let{
+                    json = JSONObject(it)
+                }
+            } catch (e: Exception) {
+                Log.e("DEBUG", "ERRO NO PROGRESS UPDATE\n${e}")
+            }
+        }
+
+        /*
+        fun streamToString(inputStream : InputStream) : String {
+            val buffReader = BufferedReader(InputStreamReader(inputStream))
+            var line : String
+            var result = ""
+
+            try {
+                do {
+                    line = buffReader.readLine()
+                    line?.let {
+                        result += line
+                    }
+                } while (line != null)
+            } catch (e : Exception) {
+                Log.e("DEBUG", "ERRO AO PARSEAR STREAM\n${e}")
+            }
+            return result
+        }
+        */
     }
 }
