@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quartoappdio_eletriccar.R
 import com.example.quartoappdio_eletriccar.data.CarFactory
+import com.example.quartoappdio_eletriccar.domain.Car
 import com.example.quartoappdio_eletriccar.presentation.adapter.CarAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONArray
@@ -98,11 +99,45 @@ class CarFragment : Fragment() {
                 values[0]?.let{
                     jsonArray = JSONTokener(it).nextValue() as JSONArray
                     for (i in 0 until jsonArray.length()){
-                        Log.d("DEBUG", "Received JSON Object ${i+1}: \n${jsonArray[i]}")
+                        val idProv : Int = jsonArray.getJSONObject(i).getInt("id")
+                        val urlPhotoProv : String = jsonArray.getJSONObject(i).getString("urlPhoto")
+                        val priceProv : Double?
+                        val batteryProv : Double?
+                        val powerProv : Double?
+                        val chargeProv : Double?
+                        var strProv = jsonArray.getJSONObject(i).getString("price")
+
+                        priceProv = if(strProv != "null") strProv.toDouble() else null
+                        strProv = jsonArray.getJSONObject(i).getString("battery")
+                        batteryProv = if(strProv != "null") strProv.toDouble() else null
+                        strProv = jsonArray.getJSONObject(i).getString("power")
+                        powerProv = if(strProv != "null") strProv.toDouble() else null
+                        strProv = jsonArray.getJSONObject(i).getString("charge")
+                        chargeProv = if(strProv != "null") strProv.toDouble() else null
+
+                        val model = Car(
+                            id = idProv,
+                            price = formatNumber(true, 2, "$ ", priceProv) ?: "-",
+                            battery = formatNumber(false, 1, " kWh", batteryProv) ?: "-",
+                            power = formatNumber(false, 0, " cv", powerProv) ?: "-",
+                            charge = formatNumber(false, 0, " min", chargeProv) ?: "-",
+                            urlPhoto = urlPhotoProv
+                        )
+                        Log.d("DEBUG", "Received JSON Object ${i+1} of price ${model.price}")
                     }
                 }
             } catch (e: Exception) {
                 Log.e("DEBUG", "ERRO NO PROGRESS UPDATE\n${e}")
+            }
+        }
+
+        fun formatNumber (inFront : Boolean, numDecimals : Int, formatSTR: String, number : Double?) : String? {
+            if(number == null) return null
+            val ret = String.format("%,.${numDecimals}f", number)
+            if (inFront) {
+                return formatSTR + ret
+            } else {
+                return ret + formatSTR
             }
         }
 
