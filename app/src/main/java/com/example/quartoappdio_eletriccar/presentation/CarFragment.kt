@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quartoappdio_eletriccar.R
@@ -21,11 +22,13 @@ import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
+import java.net.HttpURLConnection.HTTP_OK
 import java.net.URL
 
 class CarFragment : Fragment() {
     lateinit var listCars: RecyclerView
     lateinit var btnCalc: FloatingActionButton
+    lateinit var progressIcon: ProgressBar
     var carArray : ArrayList<Car> = ArrayList()
 
     override fun onCreateView(
@@ -39,7 +42,7 @@ class CarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupView(view)
-        MyTask().execute("http://192.168.1.10:8080/api/cars/")
+        callApi()
         setupListeners()
     }
 
@@ -47,10 +50,12 @@ class CarFragment : Fragment() {
         view.apply{
             listCars = findViewById(R.id.rv_list_cars)
             btnCalc = findViewById(R.id.fab_goto_calc)
+            progressIcon = findViewById(R.id.pb_load_car_screen)
         }
     }
 
     fun setupList() {
+        setupPBar(false)
         val adapter = CarAdapter(carArray)
         listCars.adapter = adapter
     }
@@ -59,6 +64,15 @@ class CarFragment : Fragment() {
         btnCalc.setOnClickListener {
             startActivity(Intent(context, CalcAutonomyActivity::class.java))
         }
+    }
+    fun callApi() {
+        MyTask().execute("http://192.168.1.10:8080/api/cars/")
+        setupPBar(true)
+    }
+
+    fun setupPBar(pActivate : Boolean){
+        progressIcon.visibility = if(pActivate) View.VISIBLE else View.GONE
+        listCars.visibility = if(pActivate) View.GONE else View.VISIBLE
     }
 
     inner class MyTask : AsyncTask<String, String, String>() {
@@ -69,6 +83,8 @@ class CarFragment : Fragment() {
         override fun doInBackground(vararg url: String?): String {
             //Log.d("DEBUG","My Task - doInBackground with params: ${url[0]}")
 
+            Thread.sleep(3500)
+
             var urlConnection : HttpURLConnection? = null
             var response : String? = null
 
@@ -78,9 +94,19 @@ class CarFragment : Fragment() {
                 urlConnection = urlBase.openConnection() as HttpURLConnection
                 urlConnection.connectTimeout = 60000
                 urlConnection.readTimeout = 60000
+                urlConnection.setRequestProperty(
+                    "Accept",
+                    "application/json"
+                )
+                val responseCode = urlConnection.responseCode
 
-                response = urlConnection.inputStream.bufferedReader().use{ it.readText() }
-                publishProgress(response)
+                if(responseCode == HTTP_OK) {
+                    response = urlConnection.inputStream.bufferedReader().use{ it.readText() }
+                    publishProgress(response)
+                } else {
+                    Log.e("DEBUG", "Retorno diferente do esperado, código ${responseCode}")
+                }
+
                 urlConnection.disconnect()
             } catch (e : Exception) {
                 Log.e("DEBUG", "ERRO NA CONEXÃO\n${e}")

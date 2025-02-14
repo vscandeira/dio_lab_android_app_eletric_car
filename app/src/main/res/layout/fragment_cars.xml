@@ -20,6 +20,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@layout/item_car"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:visibility="gone"
+        tools:visibility="visible"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -32,4 +34,20 @@
         android:contentDescription="@string/desc_fab_gotocalc_button"
         android:background="?attr/selectableItemBackgroundBorderless"
         />
+
+    <ProgressBar
+        android:id="@+id/pb_load_car_screen"
+        style="?android:attr/progressBarStyle"
+        android:indeterminate="true"
+        android:visibility="visible"
+        tools:visibility="visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+    <!--style="?android:attr/progressBarStyleHorizontal" -->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
