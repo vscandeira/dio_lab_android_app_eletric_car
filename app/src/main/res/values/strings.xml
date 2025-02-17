@@ -20,4 +20,6 @@
     <string name="desc_fab_gotocalc_button">Function that computes autonomy</string>
     <string name="desc_iv01">An eletric car</string>
     <string name="tab_cars_description">The cars tab in the maind screen</string>
+    <string name="response_error">Something wrong with connection. Try again later.</string>
+    <string name="no_connectivity">There\'s no connectivity.</string>
 </resources>

@@ -1,35 +1,37 @@
 package com.example.quartoappdio_eletriccar.presentation
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quartoappdio_eletriccar.R
-import com.example.quartoappdio_eletriccar.data.CarFactory
+import com.example.quartoappdio_eletriccar.data.CarsApi
 import com.example.quartoappdio_eletriccar.domain.Car
 import com.example.quartoappdio_eletriccar.presentation.adapter.CarAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import org.json.JSONArray
-import org.json.JSONObject
-import org.json.JSONTokener
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.HttpURLConnection.HTTP_OK
-import java.net.URL
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class CarFragment : Fragment() {
     lateinit var listCars: RecyclerView
     lateinit var btnCalc: FloatingActionButton
     lateinit var progressIcon: ProgressBar
-    var carArray : ArrayList<Car> = ArrayList()
+    lateinit var noConn: ImageView
+    lateinit var carsApi : CarsApi
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,133 +43,141 @@ class CarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRetrofit()
         setupView(view)
-        callApi()
         setupListeners()
+        val connected = checkForInternet(context)
+        if (connected) {
+            callApiRetrofit()
+        } else {
+            setupNoConnect()
+        }
     }
 
-    fun setupView(view: View) {
+    override fun onResume() {
+        super.onResume()
+        val connected = checkForInternet(context)
+        if (connected) {
+            callApiRetrofit()
+        } else {
+            setupNoConnect()
+        }
+    }
+
+    private fun setupRetrofit() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://192.168.1.10:8080/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        carsApi = retrofit.create(CarsApi::class.java)
+    }
+
+    private fun setupView(view: View) {
         view.apply{
             listCars = findViewById(R.id.rv_list_cars)
             btnCalc = findViewById(R.id.fab_goto_calc)
             progressIcon = findViewById(R.id.pb_load_car_screen)
+            noConn = findViewById(R.id.iv_empty)
         }
     }
 
-    fun setupList() {
+    fun setupList(l : List<Car>) {
         setupPBar(false)
-        val adapter = CarAdapter(carArray)
+        val adapter = CarAdapter(l)
         listCars.adapter = adapter
     }
 
-    fun setupListeners() {
+    private fun setupListeners() {
         btnCalc.setOnClickListener {
             startActivity(Intent(context, CalcAutonomyActivity::class.java))
         }
     }
-    fun callApi() {
-        MyTask().execute("http://192.168.1.10:8080/api/cars/")
+
+    private fun callApiRetrofit() {
         setupPBar(true)
+        carsApi.getAllCars().enqueue(object : Callback<List<Car>> {
+            override fun onResponse(call: Call<List<Car>>, response: Response<List<Car>>) {
+                if (response.isSuccessful){
+                    response.body()?.let{
+                        Thread.sleep(1500)
+                        setupList(treatCarsStrings(it))
+                    }
+                } else {
+                    Toast.makeText(context, R.string.response_error, Toast.LENGTH_LONG).show()
+                }
+            }
+            override fun onFailure(call: Call<List<Car>>, t: Throwable) {
+                Toast.makeText(context, R.string.response_error, Toast.LENGTH_LONG).show()
+            }
+
+        })
     }
 
-    fun setupPBar(pActivate : Boolean){
+    private fun setupPBar(pActivate : Boolean){
         progressIcon.visibility = if(pActivate) View.VISIBLE else View.GONE
         listCars.visibility = if(pActivate) View.GONE else View.VISIBLE
+        noConn.visibility = View.GONE
     }
 
-    inner class MyTask : AsyncTask<String, String, String>() {
-        override fun onPreExecute() {
-            super.onPreExecute()
-            //Log.d("DEBUG","My Task - onPreExecute (starting)")
-        }
-        override fun doInBackground(vararg url: String?): String {
-            //Log.d("DEBUG","My Task - doInBackground with params: ${url[0]}")
+    private fun setupNoConnect() {
+        progressIcon.visibility = View.GONE
+        listCars.visibility = View.GONE
+        noConn.visibility = View.VISIBLE
+    }
 
-            Thread.sleep(3500)
+    @SuppressLint("ObsoleteSdkInt")
+    private fun checkForInternet(context: Context?) : Boolean {
+        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-            var urlConnection : HttpURLConnection? = null
-            var response : String? = null
-
-            try {
-                val urlBase = URL(url[0])
-
-                urlConnection = urlBase.openConnection() as HttpURLConnection
-                urlConnection.connectTimeout = 60000
-                urlConnection.readTimeout = 60000
-                urlConnection.setRequestProperty(
-                    "Accept",
-                    "application/json"
-                )
-                val responseCode = urlConnection.responseCode
-
-                if(responseCode == HTTP_OK) {
-                    response = urlConnection.inputStream.bufferedReader().use{ it.readText() }
-                    publishProgress(response)
-                } else {
-                    Log.e("DEBUG", "Retorno diferente do esperado, código ${responseCode}")
-                }
-
-                urlConnection.disconnect()
-            } catch (e : Exception) {
-                Log.e("DEBUG", "ERRO NA CONEXÃO\n${e}")
-            } finally {
-                urlConnection?.disconnect()
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return when {
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                else -> false
             }
-
-            //Log.d("DEBUG", "Response correctly received: \n${response}")
-            return response ?: url[0] ?: "No URL Informed"
+        } else {
+            @Suppress("DEPRECATION")
+            val networkInfo = connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
         }
 
-        override fun onProgressUpdate(vararg values: String?) {
-            super.onProgressUpdate(*values)
-            try {
-                val jsonArray : JSONArray
-                values[0]?.let{
-                    jsonArray = JSONTokener(it).nextValue() as JSONArray
-                    for (i in 0 until jsonArray.length()){
-                        val idProv : Int = jsonArray.getJSONObject(i).getInt("id")
-                        val urlPhotoProv : String = jsonArray.getJSONObject(i).getString("urlPhoto")
-                        val priceProv : Double?
-                        val batteryProv : Double?
-                        val powerProv : Double?
-                        val chargeProv : Double?
-                        var strProv = jsonArray.getJSONObject(i).getString("price")
+    }
 
-                        priceProv = if(strProv != "null") strProv.toDouble() else null
-                        strProv = jsonArray.getJSONObject(i).getString("battery")
-                        batteryProv = if(strProv != "null") strProv.toDouble() else null
-                        strProv = jsonArray.getJSONObject(i).getString("power")
-                        powerProv = if(strProv != "null") strProv.toDouble() else null
-                        strProv = jsonArray.getJSONObject(i).getString("charge")
-                        chargeProv = if(strProv != "null") strProv.toDouble() else null
-
-                        val model = Car(
-                            id = idProv,
-                            price = formatNumber(true, 2, "$ ", priceProv) ?: "-",
-                            battery = formatNumber(false, 1, " kWh", batteryProv) ?: "-",
-                            power = formatNumber(false, 0, " cv", powerProv) ?: "-",
-                            charge = formatNumber(false, 0, " min", chargeProv) ?: "-",
-                            urlPhoto = urlPhotoProv
-                        )
-                        carArray.add(model)
-                        //Log.d("DEBUG", "Received JSON Object ${i+1} of price ${model.price}, battery ${model.battery}, power ${model.power} and charge ${model.charge}")
-                    }
-                    setupList()
-                }
-            } catch (e: Exception) {
-                Log.e("DEBUG", "ERRO NO PROGRESS UPDATE\n${e}")
-            }
+    private fun formatString (inFront : Boolean, numDecimals : Int, formatSTR: String, number : String?) : String? {
+        if(number == null) return null
+        val prov = number.split(".")[0]
+        val first = if (prov.length >= 4) prov.substring(0,prov.length-3) + "." +
+                prov.substring(prov.length-3,prov.length) else prov
+        val second = number.split(".")[1]
+        val ret = when {
+            numDecimals == 1 -> first + "," + second[0]
+            numDecimals == 2 -> first + ","  + second.substring(0,2)
+            else -> first
         }
-
-        fun formatNumber (inFront : Boolean, numDecimals : Int, formatSTR: String, number : Double?) : String? {
-            if(number == null) return null
-            val ret = String.format("%,.${numDecimals}f", number)
-            if (inFront) {
-                return formatSTR + ret
-            } else {
-                return ret + formatSTR
-            }
+        if (inFront) {
+            return formatSTR + ret
+        } else {
+            return ret + formatSTR
         }
+    }
 
+    private fun treatCarsStrings(oldCarList : List<Car>) : List<Car> {
+        val newCarList : MutableList<Car> = mutableListOf()
+        for (car in oldCarList) {
+            val model = Car(
+                id = car.id,
+                price = formatString(true, 2, "$ ", car.price) ?: "-",
+                battery = formatString(false, 1, " kWh", car.battery) ?: "-",
+                power = formatString(false, 0, " cv", car.power) ?: "-",
+                charge = formatString(false, 0, " min", car.charge) ?: "-",
+                urlPhoto = car.urlPhoto
+            )
+            newCarList.add(model)
+        }
+        return newCarList
     }
 }
