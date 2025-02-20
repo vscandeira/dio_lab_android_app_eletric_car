@@ -1,6 +1,6 @@
 package com.example.quartoappdio_eletriccar.presentation
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -8,8 +8,9 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.Lifecycle
 import com.example.quartoappdio_eletriccar.R
+import java.text.NumberFormat
+import java.util.Locale
 
 class CalcAutonomyActivity : ComponentActivity() {
     lateinit var price: EditText
@@ -24,9 +25,15 @@ class CalcAutonomyActivity : ComponentActivity() {
         setContentView(R.layout.activity_calc_autonomy)
         setupView()
         setupListeners()
+        setCachedResult()
     }
 
-    fun setupView() {
+    override fun onResume() {
+        super.onResume()
+        setCachedResult()
+    }
+
+    private fun setupView() {
         btnCalc = findViewById(R.id.bt_calc)
         btnGoBack = findViewById(R.id.iv_left_arrow)
         price = findViewById(R.id.et_price_km)
@@ -34,12 +41,10 @@ class CalcAutonomyActivity : ComponentActivity() {
         res_text = findViewById(R.id.tv_result)
         res_val = findViewById(R.id.tv_result_val)
     }
-    fun setupListeners() {
+    private fun setupListeners() {
         btnCalc.setOnClickListener{
             val result = calculate()
-            res_text.visibility = View.VISIBLE
-            res_val.text = result.toString()
-            res_val.visibility = View.VISIBLE
+            setResult(result)
 
         }
 
@@ -50,10 +55,47 @@ class CalcAutonomyActivity : ComponentActivity() {
         }
     }
 
-    fun calculate(): Float {
+    private fun setCachedResult() {
+        val calculatedBef = getSharedPref()
+        if (calculatedBef > 0.0) {
+            setResult(calculatedBef)
+        }
+    }
+    private fun setResult(result: Float){
+        res_text.visibility = View.VISIBLE
+        res_val.text = formatNumber(result)
+        res_val.visibility = View.VISIBLE
+    }
+
+    private fun formatNumber (result : Float) : String {
+        val numberFormat = NumberFormat.getInstance(Locale("en", "US"))
+        numberFormat.maximumFractionDigits = 2
+        numberFormat.minimumFractionDigits = 2
+
+        return numberFormat.format(result)
+    }
+
+    private fun calculate(): Float {
         val inpPrice = price.text.toString().toFloat()
         val inpTrav = trav.text.toString().toFloat()
-        return inpPrice/inpTrav
+
+        val result = inpPrice/inpTrav
+        saveSharedPref(result)
+        return result
+    }
+
+    private fun saveSharedPref(result : Float) {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
+        with(sharedPref.edit()) {
+            putFloat(getString(R.string.saved_calc), result)
+            apply()
+        }
+    }
+
+    private fun getSharedPref() : Float {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        val calc = sharedPref.getFloat(getString(R.string.saved_calc), 0.0f)
+        return calc
     }
 
 }

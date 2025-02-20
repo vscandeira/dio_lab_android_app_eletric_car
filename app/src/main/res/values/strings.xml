@@ -22,4 +22,5 @@
     <string name="tab_cars_description">The cars tab in the maind screen</string>
     <string name="response_error">Something wrong with connection. Try again later.</string>
     <string name="no_connectivity">There\'s no connectivity.</string>
+    <string name="saved_calc">saved_calc</string>
 </resources>

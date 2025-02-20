@@ -100,7 +100,7 @@ class CarFragment : Fragment() {
             override fun onResponse(call: Call<List<Car>>, response: Response<List<Car>>) {
                 if (response.isSuccessful){
                     response.body()?.let{
-                        Thread.sleep(1500)
+                        Thread.sleep(500)
                         setupList(treatCarsStrings(it))
                     }
                 } else {
