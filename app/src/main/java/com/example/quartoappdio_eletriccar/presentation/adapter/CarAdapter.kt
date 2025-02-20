@@ -15,6 +15,8 @@ import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import com.example.quartoappdio_eletriccar.R
 import com.example.quartoappdio_eletriccar.domain.Car
 
@@ -38,6 +40,14 @@ class CarAdapter(private val cars: List<Car>) : RecyclerView.Adapter<CarAdapter.
         holder.photo.load(photoUrl) {
             size(600,400)
             crossfade(true)
+            transformations(
+                RoundedCornersTransformation(
+                    topLeft = 16f,
+                    topRight = 16f,
+                    bottomLeft = 16f,
+                    bottomRight = 16f
+                )
+            )
             listener(object : ImageRequest.Listener {
                 override fun onSuccess(request: ImageRequest, result: SuccessResult) {
                     super.onSuccess(request, result)
