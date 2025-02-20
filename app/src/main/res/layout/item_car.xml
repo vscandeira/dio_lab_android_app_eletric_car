@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_car"
@@ -23,10 +22,9 @@
             android:layout_height="wrap_content"
             >
             <ImageView
-                android:id="@+id/iv_01"
+                android:id="@+id/iv_photo"
                 android:layout_width="300dp"
                 android:layout_height="200dp"
-                android:src="@drawable/carro_eletrico_01"
                 android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="16dp"
@@ -34,6 +32,22 @@
                 android:layout_marginStart="16dp"
                 app:layout_constraintTop_toTopOf="parent"
                 android:contentDescription="@string/desc_iv01"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                />
+
+            <ProgressBar
+                android:id="@+id/pb_load_photo"
+                style="?android:attr/progressBarStyle"
+                android:indeterminate="true"
+                android:visibility="visible"
+                tools:visibility="visible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="100dp"
                 />
 
             <TextView
@@ -42,8 +56,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/field_price"
                 style="@style/TextAppearance.AppCompat.Body2"
-                app:layout_constraintTop_toBottomOf="@id/iv_01"
-                app:layout_constraintStart_toStartOf="@id/iv_01"
+                app:layout_constraintTop_toBottomOf="@id/iv_photo"
+                app:layout_constraintStart_toStartOf="@id/iv_photo"
                 />
 
             <TextView
@@ -126,6 +140,8 @@
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!--android:src="@drawable/"-->
 
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
