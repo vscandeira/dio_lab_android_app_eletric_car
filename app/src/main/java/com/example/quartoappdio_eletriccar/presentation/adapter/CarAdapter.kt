@@ -14,6 +14,7 @@ import coil3.load
 import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
+import coil3.request.crossfade
 import com.example.quartoappdio_eletriccar.R
 import com.example.quartoappdio_eletriccar.domain.Car
 
@@ -35,6 +36,8 @@ class CarAdapter(private val cars: List<Car>) : RecyclerView.Adapter<CarAdapter.
         holder.charge.text = cars[position].charge
         val photoUrl = cars[position].urlPhoto
         holder.photo.load(photoUrl) {
+            size(600,400)
+            crossfade(true)
             listener(object : ImageRequest.Listener {
                 override fun onSuccess(request: ImageRequest, result: SuccessResult) {
                     super.onSuccess(request, result)
