@@ -22,6 +22,8 @@ import com.example.quartoappdio_eletriccar.domain.Car
 
 class CarAdapter(private val cars: List<Car>) : RecyclerView.Adapter<CarAdapter.ViewHolder>() {
 
+    var carItemListener : (Car) -> Unit = {}
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_car, parent, false)
         return ViewHolder(view)
@@ -36,6 +38,12 @@ class CarAdapter(private val cars: List<Car>) : RecyclerView.Adapter<CarAdapter.
         holder.battery.text = cars[position].battery
         holder.power.text = cars[position].power
         holder.charge.text = cars[position].charge
+        holder.fav.setOnClickListener{
+            val car = cars[position]
+            carItemListener(car)
+            setupFavorite(car, holder)
+        }
+
         val photoUrl = cars[position].urlPhoto
         holder.photo.load(photoUrl) {
             size(600,400)
@@ -65,18 +73,31 @@ class CarAdapter(private val cars: List<Car>) : RecyclerView.Adapter<CarAdapter.
         }
     }
 
+    private fun setupFavorite(
+        car: Car,
+        holder: ViewHolder
+    ) {
+        car.isFavorite = !car.isFavorite
+        if (car.isFavorite) {
+            holder.fav.setImageResource(R.drawable.favorite_border_01)
+        } else {
+            holder.fav.setImageResource(R.drawable.favorite_01)
+        }
+    }
+
     private fun setVisibility(holder: ViewHolder) {
         holder.pBar.visibility = View.GONE
         holder.photo.visibility = View.VISIBLE
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val price: TextView
-        val battery: TextView
-        val power: TextView
-        val charge: TextView
-        val photo: ImageView
-        val pBar: ProgressBar
+        val price : TextView
+        val battery : TextView
+        val power : TextView
+        val charge : TextView
+        val photo : ImageView
+        val pBar : ProgressBar
+        val fav : ImageView
 
         init {
             view.apply {
@@ -86,6 +107,7 @@ class CarAdapter(private val cars: List<Car>) : RecyclerView.Adapter<CarAdapter.
                 charge = findViewById(R.id.tv_charge_val)
                 photo = findViewById(R.id.iv_photo)
                 pBar = findViewById(R.id.pb_load_photo)
+                fav = findViewById(R.id.iv_favorite)
             }
         }
     }
