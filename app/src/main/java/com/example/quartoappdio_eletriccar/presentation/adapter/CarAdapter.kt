@@ -20,7 +20,7 @@ import coil3.transform.RoundedCornersTransformation
 import com.example.quartoappdio_eletriccar.R
 import com.example.quartoappdio_eletriccar.domain.Car
 
-class CarAdapter(private val cars: List<Car>) : RecyclerView.Adapter<CarAdapter.ViewHolder>() {
+class CarAdapter(private val cars: List<Car>, private val isFavoriteScreen : Boolean = false) : RecyclerView.Adapter<CarAdapter.ViewHolder>() {
 
     var carItemListener : (Car) -> Unit = {}
 
@@ -78,7 +78,7 @@ class CarAdapter(private val cars: List<Car>) : RecyclerView.Adapter<CarAdapter.
         holder: ViewHolder
     ) {
         car.isFavorite = !car.isFavorite
-        if (car.isFavorite) {
+        if (!car.isFavorite) {
             holder.fav.setImageResource(R.drawable.favorite_border_01)
         } else {
             holder.fav.setImageResource(R.drawable.favorite_01)

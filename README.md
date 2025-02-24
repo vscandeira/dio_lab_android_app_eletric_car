@@ -2,7 +2,8 @@
 App developed during DIO's (Digital Innovation One) Android training
 
 ## TO-DO
-+ Follow the training path
++ Finish favorites implementation:
+    - Refactor it to save on the external database
 + Think of more complex functionalities:
     - Login/Logout and Register
     - Admin and common users

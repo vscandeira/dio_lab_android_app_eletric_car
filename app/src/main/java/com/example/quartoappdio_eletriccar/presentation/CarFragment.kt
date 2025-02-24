@@ -7,6 +7,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +16,11 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quartoappdio_eletriccar.General
 import com.example.quartoappdio_eletriccar.R
 import com.example.quartoappdio_eletriccar.data.CarsApi
 import com.example.quartoappdio_eletriccar.domain.Car
+import com.example.quartoappdio_eletriccar.domain.local.CarRepository
 import com.example.quartoappdio_eletriccar.presentation.adapter.CarAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
@@ -87,7 +90,9 @@ class CarFragment : Fragment() {
         val adapter = CarAdapter(l)
         listCars.adapter = adapter
         adapter.carItemListener = {car: Car ->
-            val anything = car.price
+            val cr = CarRepository(requireContext())
+            cr.save(car)
+            //car.isFavorite = cr.getFavorite(car) ?: true
         }
     }
 
@@ -103,7 +108,7 @@ class CarFragment : Fragment() {
             override fun onResponse(call: Call<List<Car>>, response: Response<List<Car>>) {
                 if (response.isSuccessful){
                     response.body()?.let{
-                        setupList(treatCarsStrings(it))
+                        setupList(General.treatCarsStrings(it, requireContext()))
                     }
                 } else {
                     Toast.makeText(context, R.string.response_error, Toast.LENGTH_LONG).show()
@@ -149,38 +154,4 @@ class CarFragment : Fragment() {
 
     }
 
-    private fun formatString (inFront : Boolean, numDecimals : Int, formatSTR: String, number : String?) : String? {
-        if(number == null) return null
-        val prov = number.split(".")[0]
-        val first = if (prov.length >= 4) prov.substring(0,prov.length-3) + "," +
-                prov.substring(prov.length-3,prov.length) else prov
-        val second = number.split(".")[1]
-        val ret = when {
-            numDecimals == 1 -> first + "." + second[0]
-            numDecimals == 2 -> first + "."  + second.substring(0,2)
-            else -> first
-        }
-        if (inFront) {
-            return formatSTR + ret
-        } else {
-            return ret + formatSTR
-        }
-    }
-
-    private fun treatCarsStrings(oldCarList : List<Car>) : List<Car> {
-        val newCarList : MutableList<Car> = mutableListOf()
-        for (car in oldCarList) {
-            val model = Car(
-                id = car.id,
-                price = formatString(true, 2, "$ ", car.price) ?: "-",
-                battery = formatString(false, 1, " kWh", car.battery) ?: "-",
-                power = formatString(false, 0, " cv", car.power) ?: "-",
-                charge = formatString(false, 0, " min", car.charge) ?: "-",
-                urlPhoto = car.urlPhoto,
-                isFavorite = false
-            )
-            newCarList.add(model)
-        }
-        return newCarList
-    }
 }
